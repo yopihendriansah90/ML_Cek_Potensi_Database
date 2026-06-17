@@ -1,0 +1,830 @@
+PANDUAN PROJECT DATA MINING
+Prediksi Risiko Diabetes Menggunakan Algoritma Klasifikasi
+Environment Local Python + Streamlit
+
+============================================================
+A. INFORMASI PROJECT
+============================================================
+
+Nama Project:
+Prediksi Risiko Diabetes Menggunakan Algoritma Klasifikasi
+
+Dataset:
+Early Stage Diabetes Risk Prediction Dataset dari Kaggle
+
+Output Project:
+1. Analisis dataset
+2. Preprocessing data
+3. Training model klasifikasi
+4. Evaluasi model
+5. Aplikasi prediksi risiko diabetes menggunakan Streamlit
+
+Model yang digunakan:
+- Decision Tree
+- Random Forest
+- K-Nearest Neighbor
+- Logistic Regression
+- Naive Bayes
+
+Model terbaik yang digunakan pada aplikasi:
+Random Forest
+
+============================================================
+B. STRUKTUR FOLDER PROJECT
+============================================================
+
+Buat struktur folder seperti berikut:
+
+data_mining_database/
+|
+├── dataset/
+│   ├── diabetes_data_upload.csv
+│   ├── diabetes_clean.csv
+│   └── diabetes_clean_dedup.csv
+|
+├── model/
+│   ├── best_model.pkl
+│   └── feature_columns.pkl
+|
+├── output/
+│   ├── distribusi_class.png
+│   ├── gender_berdasarkan_class.png
+│   ├── model_comparison.csv
+│   └── perbandingan_model_f1_score.png
+|
+├── cek_dataset.py
+├── eda_preprocessing.py
+├── handle_duplicates.py
+├── train_model.py
+├── app.py
+└── requirements.txt
+
+============================================================
+C. DOWNLOAD DATASET DARI KAGGLE
+============================================================
+
+1. Buka browser.
+2. Masuk ke halaman Kaggle:
+   https://www.kaggle.com/datasets/ishandutta/early-stage-diabetes-risk-prediction-dataset
+
+3. Login ke akun Kaggle.
+4. Klik tombol Download.
+5. File akan terunduh dalam bentuk .zip.
+6. Extract file .zip.
+7. Ambil file CSV, biasanya bernama:
+
+   diabetes_data_upload.csv
+
+8. Masukkan file tersebut ke folder:
+
+   dataset/diabetes_data_upload.csv
+
+============================================================
+D. MEMBUAT PROJECT DI LOCAL PYTHON
+============================================================
+
+1. Buka terminal.
+
+2. Masuk ke folder kerja:
+
+   cd ~/coding
+
+3. Buat folder project:
+
+   mkdir data_mining_database
+
+4. Masuk ke folder project:
+
+   cd data_mining_database
+
+5. Buat folder pendukung:
+
+   mkdir dataset model output
+
+6. Masukkan file dataset ke folder dataset.
+
+============================================================
+E. MEMBUAT VIRTUAL ENVIRONMENT PYTHON
+============================================================
+
+Jalankan perintah berikut di terminal:
+
+   python3 -m venv venv
+
+Aktifkan virtual environment:
+
+Untuk Linux/Mac:
+
+   source venv/bin/activate
+
+Untuk Windows:
+
+   venv\Scripts\activate
+
+Jika berhasil, terminal akan menampilkan tanda:
+
+   (venv)
+
+Contoh:
+
+   (venv) user@computer:~/coding/data_mining_database$
+
+============================================================
+F. INSTALL LIBRARY YANG DIBUTUHKAN
+============================================================
+
+Pastikan virtual environment sudah aktif.
+
+Install library:
+
+   pip install pandas numpy matplotlib scikit-learn streamlit joblib notebook
+
+Setelah install selesai, buat file requirements.txt:
+
+   pip freeze > requirements.txt
+
+Fungsi library:
+- pandas: membaca dan mengolah dataset
+- numpy: operasi numerik
+- matplotlib: membuat grafik
+- scikit-learn: membuat model machine learning
+- streamlit: membuat aplikasi web sederhana
+- joblib: menyimpan dan membaca model
+- notebook: menjalankan Jupyter Notebook jika dibutuhkan
+
+============================================================
+G. CEK DATASET
+============================================================
+
+Buat file:
+
+   cek_dataset.py
+
+Isi kode:
+
+------------------------------------------------------------
+import pandas as pd
+
+df = pd.read_csv("dataset/diabetes_data_upload.csv")
+
+print("5 Data Pertama:")
+print(df.head())
+
+print("\nUkuran Dataset:")
+print(df.shape)
+
+print("\nNama Kolom:")
+print(df.columns)
+
+print("\nInformasi Dataset:")
+print(df.info())
+
+print("\nJumlah Missing Value:")
+print(df.isnull().sum())
+
+print("\nDistribusi Class:")
+print(df["class"].value_counts())
+------------------------------------------------------------
+
+Jalankan:
+
+   python3 cek_dataset.py
+
+Hasil yang diharapkan:
+- Dataset memiliki 520 baris dan 17 kolom.
+- Tidak ada missing value.
+- Target class terdiri dari Positive dan Negative.
+
+============================================================
+H. EDA DAN PREPROCESSING DATA
+============================================================
+
+Buat file:
+
+   eda_preprocessing.py
+
+Isi kode:
+
+------------------------------------------------------------
+import pandas as pd
+import matplotlib.pyplot as plt
+from pathlib import Path
+
+DATA_PATH = "dataset/diabetes_data_upload.csv"
+OUTPUT_DIR = Path("output")
+OUTPUT_DIR.mkdir(exist_ok=True)
+
+df = pd.read_csv(DATA_PATH)
+
+print("===== DATASET AWAL =====")
+print(df.head())
+print("\nUkuran dataset:", df.shape)
+
+df.columns = (
+    df.columns
+    .str.strip()
+    .str.lower()
+    .str.replace(" ", "_")
+)
+
+print("\n===== NAMA KOLOM SETELAH DIRAPIKAN =====")
+print(df.columns)
+
+print("\n===== MISSING VALUE =====")
+print(df.isnull().sum())
+
+duplicate_count = df.duplicated().sum()
+print("\n===== DATA DUPLIKAT =====")
+print("Jumlah data duplikat:", duplicate_count)
+
+print("\n===== NILAI UNIK SETIAP KOLOM =====")
+for col in df.columns:
+    print(f"{col}: {df[col].unique()}")
+
+print("\n===== DISTRIBUSI CLASS =====")
+print(df["class"].value_counts())
+
+plt.figure(figsize=(6, 4))
+df["class"].value_counts().plot(kind="bar")
+plt.title("Distribusi Class Diabetes")
+plt.xlabel("Class")
+plt.ylabel("Jumlah Data")
+plt.tight_layout()
+plt.savefig(OUTPUT_DIR / "distribusi_class.png")
+plt.close()
+
+gender_class = pd.crosstab(df["gender"], df["class"])
+
+print("\n===== DISTRIBUSI GENDER BERDASARKAN CLASS =====")
+print(gender_class)
+
+gender_class.plot(kind="bar", figsize=(7, 4))
+plt.title("Distribusi Gender Berdasarkan Class")
+plt.xlabel("Gender")
+plt.ylabel("Jumlah Data")
+plt.tight_layout()
+plt.savefig(OUTPUT_DIR / "gender_berdasarkan_class.png")
+plt.close()
+
+df_encoded = df.copy()
+
+df_encoded["class"] = df_encoded["class"].map({
+    "Positive": 1,
+    "Negative": 0
+})
+
+df_encoded["gender"] = df_encoded["gender"].map({
+    "Male": 1,
+    "Female": 0
+})
+
+for col in df_encoded.columns:
+    if df_encoded[col].dtype == "object":
+        df_encoded[col] = df_encoded[col].map({
+            "Yes": 1,
+            "No": 0
+        })
+
+print("\n===== DATA SETELAH ENCODING =====")
+print(df_encoded.head())
+
+print("\n===== TIPE DATA SETELAH ENCODING =====")
+print(df_encoded.info())
+
+df_encoded.to_csv("dataset/diabetes_clean.csv", index=False)
+
+print("\nDataset bersih berhasil disimpan ke:")
+print("dataset/diabetes_clean.csv")
+
+print("\nGrafik berhasil disimpan ke folder:")
+print("output/")
+------------------------------------------------------------
+
+Jalankan:
+
+   python3 eda_preprocessing.py
+
+Output yang dihasilkan:
+- dataset/diabetes_clean.csv
+- output/distribusi_class.png
+- output/gender_berdasarkan_class.png
+
+============================================================
+I. MENANGANI DATA DUPLIKAT
+============================================================
+
+Buat file:
+
+   handle_duplicates.py
+
+Isi kode:
+
+------------------------------------------------------------
+import pandas as pd
+
+df = pd.read_csv("dataset/diabetes_clean.csv")
+
+print("===== DATASET SEBELUM MENGHAPUS DUPLIKAT =====")
+print("Ukuran dataset:", df.shape)
+
+print("\nDistribusi class sebelum hapus duplikat:")
+print(df["class"].value_counts())
+
+duplicate_count = df.duplicated().sum()
+print("\nJumlah data duplikat:", duplicate_count)
+
+df_dedup = df.drop_duplicates()
+
+print("\n===== DATASET SETELAH MENGHAPUS DUPLIKAT =====")
+print("Ukuran dataset:", df_dedup.shape)
+
+print("\nDistribusi class setelah hapus duplikat:")
+print(df_dedup["class"].value_counts())
+
+df_dedup.to_csv("dataset/diabetes_clean_dedup.csv", index=False)
+
+print("\nDataset tanpa duplikat berhasil disimpan ke:")
+print("dataset/diabetes_clean_dedup.csv")
+------------------------------------------------------------
+
+Jalankan:
+
+   python3 handle_duplicates.py
+
+Hasil yang diperoleh:
+- Dataset awal: 520 data
+- Data duplikat: 269 data
+- Dataset setelah duplikat dihapus: 251 data
+- Positive: 173 data
+- Negative: 78 data
+
+Output:
+- dataset/diabetes_clean_dedup.csv
+
+============================================================
+J. TRAINING MODEL KLASIFIKASI
+============================================================
+
+Buat file:
+
+   train_model.py
+
+Isi kode:
+
+------------------------------------------------------------
+import pandas as pd
+import matplotlib.pyplot as plt
+from pathlib import Path
+import joblib
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix,
+    classification_report
+)
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+
+MODEL_DIR = Path("model")
+OUTPUT_DIR = Path("output")
+
+MODEL_DIR.mkdir(exist_ok=True)
+OUTPUT_DIR.mkdir(exist_ok=True)
+
+df = pd.read_csv("dataset/diabetes_clean_dedup.csv")
+
+print("===== DATASET FINAL =====")
+print("Ukuran dataset:", df.shape)
+print("\nDistribusi class:")
+print(df["class"].value_counts())
+
+X = df.drop("class", axis=1)
+y = df["class"]
+
+feature_columns = X.columns.tolist()
+
+print("\nJumlah fitur:", len(feature_columns))
+print("Nama fitur:")
+print(feature_columns)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+print("\n===== SPLIT DATA =====")
+print("Data training:", X_train.shape)
+print("Data testing:", X_test.shape)
+
+print("\nDistribusi class pada data training:")
+print(y_train.value_counts())
+
+print("\nDistribusi class pada data testing:")
+print(y_test.value_counts())
+
+models = {
+    "Decision Tree": DecisionTreeClassifier(
+        random_state=42,
+        class_weight="balanced"
+    ),
+
+    "Random Forest": RandomForestClassifier(
+        n_estimators=100,
+        random_state=42,
+        class_weight="balanced"
+    ),
+
+    "KNN": Pipeline([
+        ("scaler", StandardScaler()),
+        ("knn", KNeighborsClassifier(n_neighbors=5))
+    ]),
+
+    "Logistic Regression": Pipeline([
+        ("scaler", StandardScaler()),
+        ("logreg", LogisticRegression(
+            random_state=42,
+            max_iter=1000,
+            class_weight="balanced"
+        ))
+    ]),
+
+    "Naive Bayes": GaussianNB()
+}
+
+results = []
+
+best_model_name = None
+best_model = None
+best_f1 = 0
+
+print("\n===== HASIL EVALUASI MODEL =====")
+
+for model_name, model in models.items():
+    print(f"\n--- {model_name} ---")
+
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_test)
+
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, zero_division=0)
+    recall = recall_score(y_test, y_pred, zero_division=0)
+    f1 = f1_score(y_test, y_pred, zero_division=0)
+
+    cm = confusion_matrix(y_test, y_pred)
+
+    print("Accuracy :", round(accuracy, 4))
+    print("Precision:", round(precision, 4))
+    print("Recall   :", round(recall, 4))
+    print("F1-score :", round(f1, 4))
+    print("Confusion Matrix:")
+    print(cm)
+
+    print("\nClassification Report:")
+    print(classification_report(y_test, y_pred, zero_division=0))
+
+    results.append({
+        "Model": model_name,
+        "Accuracy": accuracy,
+        "Precision": precision,
+        "Recall": recall,
+        "F1-score": f1
+    })
+
+    if f1 > best_f1:
+        best_f1 = f1
+        best_model_name = model_name
+        best_model = model
+
+results_df = pd.DataFrame(results)
+results_df = results_df.sort_values(by="F1-score", ascending=False)
+
+print("\n===== PERBANDINGAN MODEL =====")
+print(results_df)
+
+results_df.to_csv("output/model_comparison.csv", index=False)
+
+joblib.dump(best_model, "model/best_model.pkl")
+joblib.dump(feature_columns, "model/feature_columns.pkl")
+
+print("\n===== MODEL TERBAIK =====")
+print("Model terbaik:", best_model_name)
+print("F1-score terbaik:", round(best_f1, 4))
+
+print("\nModel berhasil disimpan ke:")
+print("model/best_model.pkl")
+
+print("\nFeature columns berhasil disimpan ke:")
+print("model/feature_columns.pkl")
+
+plt.figure(figsize=(8, 5))
+plt.bar(results_df["Model"], results_df["F1-score"])
+plt.title("Perbandingan F1-score Model Klasifikasi")
+plt.xlabel("Model")
+plt.ylabel("F1-score")
+plt.xticks(rotation=30)
+plt.tight_layout()
+plt.savefig("output/perbandingan_model_f1_score.png")
+plt.close()
+
+print("\nGrafik perbandingan model disimpan ke:")
+print("output/perbandingan_model_f1_score.png")
+------------------------------------------------------------
+
+Jalankan:
+
+   python3 train_model.py
+
+Output yang dihasilkan:
+- model/best_model.pkl
+- model/feature_columns.pkl
+- output/model_comparison.csv
+- output/perbandingan_model_f1_score.png
+
+Hasil model terbaik:
+Random Forest
+
+Hasil evaluasi Random Forest:
+- Accuracy: 92.16%
+- Precision: 100%
+- Recall: 88.57%
+- F1-score: 93.94%
+
+============================================================
+K. MEMBUAT APLIKASI STREAMLIT
+============================================================
+
+Buat file:
+
+   app.py
+
+Isi kode:
+
+------------------------------------------------------------
+import streamlit as st
+import pandas as pd
+import joblib
+
+st.set_page_config(
+    page_title="Prediksi Risiko Diabetes",
+    page_icon="🩺",
+    layout="centered"
+)
+
+model = joblib.load("model/best_model.pkl")
+feature_columns = joblib.load("model/feature_columns.pkl")
+
+def yes_no_to_number(value):
+    return 1 if value == "Yes" else 0
+
+def gender_to_number(value):
+    return 1 if value == "Male" else 0
+
+st.title("🩺 Aplikasi Prediksi Risiko Diabetes")
+st.write(
+    "Aplikasi ini menggunakan model klasifikasi Random Forest "
+    "untuk memprediksi risiko diabetes berdasarkan gejala awal pasien."
+)
+
+st.warning(
+    "Catatan: Aplikasi ini dibuat untuk keperluan akademik/praktik Data Mining, "
+    "bukan sebagai alat diagnosis medis resmi."
+)
+
+st.divider()
+
+st.subheader("Masukkan Data Pasien")
+
+age = st.number_input(
+    "Usia",
+    min_value=1,
+    max_value=120,
+    value=40
+)
+
+gender = st.selectbox(
+    "Jenis Kelamin",
+    ["Male", "Female"]
+)
+
+polyuria = st.selectbox("Polyuria / Sering buang air kecil", ["Yes", "No"])
+polydipsia = st.selectbox("Polydipsia / Sering haus", ["Yes", "No"])
+sudden_weight_loss = st.selectbox("Penurunan berat badan tiba-tiba", ["Yes", "No"])
+weakness = st.selectbox("Kelemahan tubuh", ["Yes", "No"])
+polyphagia = st.selectbox("Polyphagia / Sering lapar berlebihan", ["Yes", "No"])
+genital_thrush = st.selectbox("Genital thrush", ["Yes", "No"])
+visual_blurring = st.selectbox("Penglihatan kabur", ["Yes", "No"])
+itching = st.selectbox("Gatal-gatal", ["Yes", "No"])
+irritability = st.selectbox("Mudah marah / iritabilitas", ["Yes", "No"])
+delayed_healing = st.selectbox("Luka sulit sembuh", ["Yes", "No"])
+partial_paresis = st.selectbox("Partial paresis / kelemahan sebagian otot", ["Yes", "No"])
+muscle_stiffness = st.selectbox("Kekakuan otot", ["Yes", "No"])
+alopecia = st.selectbox("Alopecia / rambut rontok", ["Yes", "No"])
+obesity = st.selectbox("Obesitas", ["Yes", "No"])
+
+input_data = {
+    "age": age,
+    "gender": gender_to_number(gender),
+    "polyuria": yes_no_to_number(polyuria),
+    "polydipsia": yes_no_to_number(polydipsia),
+    "sudden_weight_loss": yes_no_to_number(sudden_weight_loss),
+    "weakness": yes_no_to_number(weakness),
+    "polyphagia": yes_no_to_number(polyphagia),
+    "genital_thrush": yes_no_to_number(genital_thrush),
+    "visual_blurring": yes_no_to_number(visual_blurring),
+    "itching": yes_no_to_number(itching),
+    "irritability": yes_no_to_number(irritability),
+    "delayed_healing": yes_no_to_number(delayed_healing),
+    "partial_paresis": yes_no_to_number(partial_paresis),
+    "muscle_stiffness": yes_no_to_number(muscle_stiffness),
+    "alopecia": yes_no_to_number(alopecia),
+    "obesity": yes_no_to_number(obesity)
+}
+
+input_df = pd.DataFrame([input_data])
+input_df = input_df[feature_columns]
+
+st.divider()
+
+if st.button("Prediksi Risiko Diabetes"):
+    prediction = model.predict(input_df)[0]
+
+    if hasattr(model, "predict_proba"):
+        probability = model.predict_proba(input_df)[0]
+        prob_negative = probability[0]
+        prob_positive = probability[1]
+    else:
+        prob_negative = None
+        prob_positive = None
+
+    st.subheader("Hasil Prediksi")
+
+    if prediction == 1:
+        st.error("Hasil: Pasien Berisiko Diabetes")
+    else:
+        st.success("Hasil: Pasien Tidak Berisiko Diabetes")
+
+    if prob_positive is not None:
+        st.write(f"Probabilitas Tidak Berisiko: **{prob_negative * 100:.2f}%**")
+        st.write(f"Probabilitas Berisiko Diabetes: **{prob_positive * 100:.2f}%**")
+
+        st.progress(float(prob_positive))
+
+    st.divider()
+
+    st.subheader("Data Input yang Diproses Model")
+    st.dataframe(input_df)
+------------------------------------------------------------
+
+============================================================
+L. MENJALANKAN APLIKASI STREAMLIT
+============================================================
+
+Pastikan virtual environment aktif:
+
+   source venv/bin/activate
+
+Jalankan aplikasi:
+
+   streamlit run app.py
+
+Jika berhasil, terminal akan menampilkan alamat seperti:
+
+   Local URL: http://localhost:8501
+
+Buka alamat tersebut di browser.
+
+============================================================
+M. URUTAN EKSEKUSI PROJECT DARI AWAL SAMPAI AKHIR
+============================================================
+
+Jalankan file secara berurutan:
+
+1. Cek dataset
+
+   python3 cek_dataset.py
+
+2. EDA dan preprocessing
+
+   python3 eda_preprocessing.py
+
+3. Hapus data duplikat
+
+   python3 handle_duplicates.py
+
+4. Training dan evaluasi model
+
+   python3 train_model.py
+
+5. Jalankan aplikasi Streamlit
+
+   streamlit run app.py
+
+============================================================
+N. TROUBLESHOOTING
+============================================================
+
+1. Error: FileNotFoundError
+
+Penyebab:
+File dataset tidak ditemukan.
+
+Solusi:
+Pastikan file berada di:
+
+   dataset/diabetes_data_upload.csv
+
+2. Error: ModuleNotFoundError
+
+Penyebab:
+Library belum terinstall atau virtual environment belum aktif.
+
+Solusi:
+Aktifkan venv:
+
+   source venv/bin/activate
+
+Install ulang library:
+
+   pip install pandas numpy matplotlib scikit-learn streamlit joblib notebook
+
+3. Streamlit tidak terbuka otomatis
+
+Solusi:
+Copy alamat Local URL dari terminal, lalu buka manual di browser.
+
+Biasanya:
+
+   http://localhost:8501
+
+4. Perintah python tidak ditemukan
+
+Solusi Linux:
+Gunakan:
+
+   python3
+
+Solusi Windows:
+Gunakan:
+
+   python
+
+atau:
+
+   py
+
+============================================================
+O. CATATAN UNTUK LAPORAN
+============================================================
+
+Dataset awal terdiri dari 520 data dan 17 kolom, yaitu 16 fitur dan 1 target class. Dataset tidak memiliki missing value, tetapi memiliki 269 data duplikat. Data duplikat dihapus untuk menghindari data leakage pada proses training dan testing. Setelah pembersihan, dataset akhir berjumlah 251 data, terdiri dari 173 data kelas Positive dan 78 data kelas Negative.
+
+Data kategorikal diubah menjadi numerik:
+- Yes = 1
+- No = 0
+- Male = 1
+- Female = 0
+- Positive = 1
+- Negative = 0
+
+Data dibagi menjadi 80% data training dan 20% data testing menggunakan stratify agar proporsi kelas tetap seimbang.
+
+Model yang dibandingkan:
+- Decision Tree
+- Random Forest
+- KNN
+- Logistic Regression
+- Naive Bayes
+
+Model terbaik adalah Random Forest dengan hasil:
+- Accuracy: 92.16%
+- Precision: 100%
+- Recall: 88.57%
+- F1-score: 93.94%
+
+Aplikasi dibangun menggunakan Streamlit dan menampilkan prediksi risiko diabetes berdasarkan input gejala pengguna.
+
+============================================================
+P. CATATAN PENTING
+============================================================
+
+Aplikasi ini hanya digunakan untuk keperluan akademik dan praktik Data Mining.
+Aplikasi ini bukan alat diagnosis medis resmi.
+Hasil prediksi tidak boleh digunakan sebagai pengganti pemeriksaan dokter atau tenaga kesehatan profesional.
+
+============================================================
+SELESAI
+============================================================

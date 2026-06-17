@@ -1,0 +1,480 @@
+PANDUAN MENJALANKAN PROJECT DARI GITHUB
+Project: Prediksi Risiko Diabetes Menggunakan Algoritma Klasifikasi
+Aplikasi: Python + Streamlit
+
+============================================================
+A. TUJUAN PANDUAN
+============================================================
+
+Panduan ini digunakan untuk menjalankan project setelah source code diambil dari GitHub menggunakan perintah git clone.
+
+Project ini berisi:
+1. Dataset diabetes
+2. Script preprocessing
+3. Script training model
+4. File model machine learning
+5. Aplikasi Streamlit untuk prediksi risiko diabetes
+
+============================================================
+B. PERSIAPAN SEBELUM MENJALANKAN PROJECT
+============================================================
+
+Pastikan perangkat sudah memiliki:
+
+1. Git
+2. Python 3.10 atau Python 3.11
+3. VS Code atau text editor lain
+4. Koneksi internet untuk install library Python
+5. Terminal atau Command Prompt
+
+Cek Git:
+
+   git --version
+
+Cek Python:
+
+Linux/Mac:
+
+   python3 --version
+
+Windows:
+
+   python --version
+
+atau:
+
+   py --version
+
+============================================================
+C. CLONE PROJECT DARI GITHUB
+============================================================
+
+1. Buka terminal.
+
+2. Masuk ke folder tempat menyimpan project, contoh:
+
+   cd ~/coding
+
+3. Jalankan perintah git clone:
+
+   git clone URL_REPOSITORY_GITHUB
+
+Contoh:
+
+   git clone https://github.com/username/diabetes-risk-prediction.git
+
+4. Masuk ke folder project:
+
+   cd diabetes-risk-prediction
+
+Catatan:
+Ganti URL_REPOSITORY_GITHUB dengan link repository GitHub project yang sebenarnya.
+
+============================================================
+D. STRUKTUR FOLDER YANG DIHARAPKAN
+============================================================
+
+Setelah git clone, struktur folder idealnya seperti ini:
+
+diabetes-risk-prediction/
+|
+├── dataset/
+│   ├── diabetes_data_upload.csv
+│   ├── diabetes_clean.csv
+│   └── diabetes_clean_dedup.csv
+|
+├── model/
+│   ├── best_model.pkl
+│   └── feature_columns.pkl
+|
+├── output/
+│   ├── distribusi_class.png
+│   ├── gender_berdasarkan_class.png
+│   ├── model_comparison.csv
+│   └── perbandingan_model_f1_score.png
+|
+├── cek_dataset.py
+├── eda_preprocessing.py
+├── handle_duplicates.py
+├── train_model.py
+├── app.py
+├── requirements.txt
+└── README.md
+
+Catatan:
+Jika folder model/ belum berisi best_model.pkl dan feature_columns.pkl, maka jalankan ulang proses training model.
+
+============================================================
+E. MEMBUAT VIRTUAL ENVIRONMENT
+============================================================
+
+Virtual environment digunakan agar library project tidak bercampur dengan Python utama di komputer.
+
+Linux/Mac:
+
+   python3 -m venv venv
+
+Windows:
+
+   python -m venv venv
+
+atau:
+
+   py -m venv venv
+
+============================================================
+F. MENGAKTIFKAN VIRTUAL ENVIRONMENT
+============================================================
+
+Linux/Mac:
+
+   source venv/bin/activate
+
+Windows CMD:
+
+   venv\Scripts\activate
+
+Windows PowerShell:
+
+   .\venv\Scripts\Activate.ps1
+
+Jika berhasil, terminal akan menampilkan tanda:
+
+   (venv)
+
+Contoh:
+
+   (venv) user@computer:~/coding/diabetes-risk-prediction$
+
+============================================================
+G. INSTALL LIBRARY PROJECT
+============================================================
+
+Jika repository sudah memiliki file requirements.txt, jalankan:
+
+   pip install -r requirements.txt
+
+Jika file requirements.txt tidak tersedia, install manual:
+
+   pip install pandas numpy matplotlib scikit-learn streamlit joblib notebook
+
+Setelah selesai, cek library:
+
+   pip list
+
+============================================================
+H. MENYIAPKAN DATASET
+============================================================
+
+Pastikan file dataset utama tersedia di folder:
+
+   dataset/diabetes_data_upload.csv
+
+Jika dataset belum ada, download dari Kaggle:
+
+   https://www.kaggle.com/datasets/ishandutta/early-stage-diabetes-risk-prediction-dataset
+
+Setelah download:
+1. Extract file .zip
+2. Ambil file diabetes_data_upload.csv
+3. Masukkan ke folder dataset/
+
+Lokasi akhir harus seperti ini:
+
+   dataset/diabetes_data_upload.csv
+
+============================================================
+I. MENJALANKAN PROJECT DARI AWAL
+============================================================
+
+Jika ingin menjalankan project dari tahap awal, jalankan file secara berurutan:
+
+1. Cek dataset
+
+   python3 cek_dataset.py
+
+Untuk Windows:
+
+   python cek_dataset.py
+
+2. EDA dan preprocessing
+
+   python3 eda_preprocessing.py
+
+Untuk Windows:
+
+   python eda_preprocessing.py
+
+3. Menghapus data duplikat
+
+   python3 handle_duplicates.py
+
+Untuk Windows:
+
+   python handle_duplicates.py
+
+4. Training dan evaluasi model
+
+   python3 train_model.py
+
+Untuk Windows:
+
+   python train_model.py
+
+5. Menjalankan aplikasi Streamlit
+
+   streamlit run app.py
+
+============================================================
+J. MENJALANKAN PROJECT JIKA MODEL SUDAH ADA
+============================================================
+
+Jika folder model/ sudah berisi:
+
+   model/best_model.pkl
+   model/feature_columns.pkl
+
+Maka tidak perlu menjalankan training ulang.
+
+Langsung jalankan aplikasi:
+
+   streamlit run app.py
+
+Kemudian buka browser pada alamat:
+
+   http://localhost:8501
+
+Biasanya Streamlit akan membuka browser secara otomatis.
+
+============================================================
+K. ALUR KERJA PROJECT
+============================================================
+
+Alur program:
+
+1. Dataset asli dibaca dari folder dataset/
+2. Data dicek menggunakan cek_dataset.py
+3. Data diproses menggunakan eda_preprocessing.py
+4. Data duplikat dihapus menggunakan handle_duplicates.py
+5. Model dilatih menggunakan train_model.py
+6. Model terbaik disimpan ke folder model/
+7. Aplikasi Streamlit membaca model dari folder model/
+8. User memasukkan gejala pasien
+9. Aplikasi menampilkan hasil prediksi risiko diabetes
+
+============================================================
+L. OUTPUT YANG DIHASILKAN
+============================================================
+
+Setelah semua script dijalankan, project akan menghasilkan:
+
+1. Dataset hasil preprocessing:
+
+   dataset/diabetes_clean.csv
+
+2. Dataset tanpa duplikat:
+
+   dataset/diabetes_clean_dedup.csv
+
+3. Model terbaik:
+
+   model/best_model.pkl
+
+4. Daftar fitur model:
+
+   model/feature_columns.pkl
+
+5. Hasil evaluasi model:
+
+   output/model_comparison.csv
+
+6. Grafik evaluasi model:
+
+   output/perbandingan_model_f1_score.png
+
+7. Grafik EDA:
+
+   output/distribusi_class.png
+   output/gender_berdasarkan_class.png
+
+============================================================
+M. CARA DEMO APLIKASI
+============================================================
+
+1. Aktifkan virtual environment:
+
+   source venv/bin/activate
+
+2. Jalankan aplikasi:
+
+   streamlit run app.py
+
+3. Buka alamat:
+
+   http://localhost:8501
+
+4. Masukkan data pasien:
+   - usia
+   - jenis kelamin
+   - polyuria
+   - polydipsia
+   - penurunan berat badan tiba-tiba
+   - kelemahan tubuh
+   - polyphagia
+   - genital thrush
+   - penglihatan kabur
+   - gatal-gatal
+   - iritabilitas
+   - luka sulit sembuh
+   - partial paresis
+   - kekakuan otot
+   - alopecia
+   - obesitas
+
+5. Klik tombol:
+
+   Prediksi Risiko Diabetes
+
+6. Aplikasi akan menampilkan hasil:
+   - Pasien Berisiko Diabetes
+   atau
+   - Pasien Tidak Berisiko Diabetes
+
+7. Aplikasi juga menampilkan probabilitas prediksi.
+
+============================================================
+N. TROUBLESHOOTING
+============================================================
+
+1. Error: git command not found
+
+Penyebab:
+Git belum terinstall.
+
+Solusi:
+Install Git terlebih dahulu dari:
+
+   https://git-scm.com/
+
+2. Error: python3 command not found
+
+Penyebab:
+Python belum terinstall atau nama command berbeda.
+
+Solusi:
+Coba gunakan:
+
+   python --version
+
+atau:
+
+   py --version
+
+3. Error: ModuleNotFoundError
+
+Penyebab:
+Library belum terinstall atau virtual environment belum aktif.
+
+Solusi:
+
+   source venv/bin/activate
+   pip install -r requirements.txt
+
+Jika requirements.txt tidak ada:
+
+   pip install pandas numpy matplotlib scikit-learn streamlit joblib notebook
+
+4. Error: FileNotFoundError dataset
+
+Penyebab:
+File dataset tidak ditemukan.
+
+Solusi:
+Pastikan file ada di:
+
+   dataset/diabetes_data_upload.csv
+
+5. Error: FileNotFoundError model/best_model.pkl
+
+Penyebab:
+Model belum dibuat.
+
+Solusi:
+Jalankan training model:
+
+   python3 train_model.py
+
+atau Windows:
+
+   python train_model.py
+
+6. Streamlit tidak terbuka otomatis
+
+Solusi:
+Copy alamat Local URL dari terminal dan buka manual di browser:
+
+   http://localhost:8501
+
+7. Error permission activate virtual environment di PowerShell
+
+Solusi:
+Jalankan PowerShell sebagai administrator lalu ketik:
+
+   Set-ExecutionPolicy RemoteSigned
+
+Setelah itu aktifkan venv:
+
+   .\venv\Scripts\Activate.ps1
+
+============================================================
+O. COMMAND RINGKAS DARI AWAL SAMPAI JALAN
+============================================================
+
+Linux/Mac:
+
+   git clone URL_REPOSITORY_GITHUB
+   cd diabetes-risk-prediction
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   python3 cek_dataset.py
+   python3 eda_preprocessing.py
+   python3 handle_duplicates.py
+   python3 train_model.py
+   streamlit run app.py
+
+Windows:
+
+   git clone URL_REPOSITORY_GITHUB
+   cd diabetes-risk-prediction
+   python -m venv venv
+   venv\Scripts\activate
+   pip install -r requirements.txt
+   python cek_dataset.py
+   python eda_preprocessing.py
+   python handle_duplicates.py
+   python train_model.py
+   streamlit run app.py
+
+Jika model sudah tersedia, cukup:
+
+   git clone URL_REPOSITORY_GITHUB
+   cd diabetes-risk-prediction
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   streamlit run app.py
+
+============================================================
+P. CATATAN PENTING
+============================================================
+
+Aplikasi ini dibuat untuk keperluan akademik dan praktik Data Mining.
+
+Aplikasi ini bukan alat diagnosis medis resmi.
+
+Hasil prediksi tidak boleh digunakan sebagai pengganti pemeriksaan dokter atau tenaga kesehatan profesional.
+
+============================================================
+SELESAI
+============================================================
